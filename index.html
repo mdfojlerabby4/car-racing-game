@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jayan Kritik - Mercedes Racing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #111;
+            color: white;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Game Menu Screen */
+        #gameMenu {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 30, 0, 0.9), rgba(0, 20, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .game-title {
+            font-size: 2.8rem;
+            color: #fff;
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .mercedes-logo {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #000 30%, #333 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            border: 3px solid silver;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .mercedes-logo i {
+            font-size: 5rem;
+            color: silver;
+        }
+        
+        .menu-btn {
+            background: linear-gradient(to bottom, #333, #000);
+            color: white;
+            border: 2px solid silver;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .menu-btn:hover, .menu-btn:active {
+            background: linear-gradient(to bottom, #00aa00, #006600);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #00ff00;
+        }
+        
+        /* Game Canvas */
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(to bottom, #87CEEB, #1E90FF);
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Game UI */
+        .game-ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .score-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+            pointer-events: none;
+            border: 2px solid gold;
+        }
+        
+        .game-over-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        .game-over-title {
+            font-size: 3.5rem;
+            color: #ff3333;
+            text-shadow: 0 0 10px #ff0000;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .final-score {
+            font-size: 2.5rem;
+            color: gold;
+            margin-bottom: 40px;
+        }
+        
+        /* Control Buttons */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            pointer-events: auto;
+        }
+        
+        .control-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+            transition: all 0.2s;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.9);
+            background: rgba(50, 50, 50, 0.9);
+        }
+        
+        .brake-btn {
+            color: #ff5555;
+        }
+        
+        .accelerate-btn {
+            color: #55ff55;
+        }
+        
+        .tilt-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            border: 1px solid #444;
+        }
+        
+        .tilt-icon {
+            margin-right: 10px;
+            color: #4d94ff;
+        }
+        
+        /* Car Styling */
+        .player-car {
+            position: absolute;
+            width: 120px;
+            height: 240px;
+            z-index: 3;
+            transition: transform 0.1s;
+        }
+        
+        .car-body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 10px 10px 30px 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
+        }
+        
+        .car-top {
+            width: 80%;
+            height: 40%;
+            background: #000;
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            border-radius: 10px 10px 20px 20px;
+        }
+        
+        .car-window {
+            width: 70%;
+            height: 60%;
+            background: #1a5276;
+            position: absolute;
+            top: 20%;
+            left: 15%;
+            border-radius: 5px;
+        }
+        
+        .car-logo {
+            position: absolute;
+            top: 5%;
+            left: 43%;
+            width: 14%;
+            height: 8%;
+            background: silver;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .car-text {
+            position: absolute;
+            color: silver;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .car-name {
+            bottom: 15%;
+            width: 100%;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        
+        .back-seat {
+            bottom: 5%;
+            left: 10%;
+            font-size: 0.9rem;
+        }
+        
+        .car-wheel {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #333;
+            border-radius: 50%;
+            border: 3px solid #111;
+            bottom: 5px;
+        }
+        
+        .front-wheel {
+            right: 10px;
+        }
+        
+        .back-wheel {
+            left: 10px;
+        }
+        
+        .other-car {
+            position: absolute;
+            width: 100px;
+            height: 200px;
+            z-index: 2;
+        }
+        
+        .truck {
+            width: 120px;
+            height: 250px;
+        }
+        
+        /* Road elements */
+        .road-line {
+            position: absolute;
+            height: 40px;
+            width: 10px;
+            background: white;
+        }
+        
+        .tree {
+            position: absolute;
+            width: 60px;
+            height: 120px;
+            background: #2d5a27;
+            border-radius: 30px 30px 0 0;
+        }
+        
+        .tree-trunk {
+            position: absolute;
+            width: 15px;
+            height: 40px;
+            background: #8b4513;
+            bottom: -40px;
+            left: 22.5px;
+        }
+        
+        .river {
+            position: absolute;
+            background: #1e90ff;
+            border-radius: 10px;
+        }
+        
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            bottom: 120px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .player-car {
+                width: 80px;
+                height: 160px;
+            }
+            
+            .other-car {
+                width: 70px;
+                height: 140px;
+            }
+            
+            .truck {
+                width: 90px;
+                height: 190px;
+            }
+            
+            .control-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+            
+            .game-title {
+                font-size: 2.2rem;
+            }
+            
+            .score-display {
+                font-size: 1.5rem;
+                padding: 8px 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .player-car {
+                width: 70px;
+                height: 140px;
+            }
+            
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Game Menu -->
+        <div id="gameMenu">
+            <div class="mercedes-logo">
+                <i class="fas fa-star"></i>
+            </div>
+            <h1 class="game-title">JAYAN KRITIK<br>MERCEDES RACING</h1>
+            <button class="menu-btn" id="startBtn">
+                <i class="fas fa-play"></i> START RACE
+            </button>
+            <button class="menu-btn" id="soundToggle">
+                <i class="fas fa-volume-up"></i> SOUND ON
+            </button>
+            <div class="instructions">
+                <p>Use brake (left) and accelerate (right) buttons or tilt your device to steer</p>
+                <p>Avoid collisions with other vehicles!</p>
+            </div>
+        </div>
+        
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Game UI -->
+        <div class="game-ui">
+            <div class="score-display">SCORE: <span id="score">0</span></div>
+            <div class="tilt-indicator">
+                <i class="fas fa-mobile-alt tilt-icon"></i>
+                <span>TILT TO STEER</span>
+            </div>
+            
+            <!-- Game Over Screen -->
+            <div class="game-over-screen" id="gameOverScreen">
+                <h1 class="game-over-title">GAME OVER</h1>
+                <div class="final-score">FINAL SCORE: <span id="finalScore">0</span></div>
+                <button class="menu-btn" id="playAgainBtn">
+                    <i class="fas fa-redo"></i> PLAY AGAIN
+                </button>
+                <button class="menu-btn" id="menuBtn">
+                    <i class="fas fa-home"></i> MAIN MENU
+                </button>
+            </div>
+            
+            <!-- Control Buttons -->
+            <div class="controls">
+                <div class="control-btn brake-btn" id="brakeBtn">
+                    <i class="fas fa-hand-paper"></i>
+                </div>
+                <div class="control-btn accelerate-btn" id="accelerateBtn">
+                    <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="engineSound" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-car-engine-starting-1555.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="crashSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-car-crash-with-explosion-1616.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="accelerateSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-accelerating-sports-car-engine-1600.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="brakeSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-car-brakes-screech-1060.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameMenu = document.getElementById('gameMenu');
+        const startBtn = document.getElementById('startBtn');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const scoreDisplay = document.getElementById('score');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const brakeBtn = document.getElementById('brakeBtn');
+        const accelerateBtn = document.getElementById('accelerateBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        
+        // Audio elements
+        const engineSound = document.getElementById('engineSound');
+        const crashSound = document.getElementById('crashSound');
+        const accelerateSound = document.getElementById('accelerateSound');
+        const brakeSound = document.getElementById('brakeSound');
+        
+        // Game state
+        let gameRunning = false;
+        let score = 0;
+        let gameSpeed = 5;
+        let playerSpeed = 0;
+        let playerX = 0;
+        let playerY = 0;
+        let playerLane = 2; // 1, 2, or 3 (left, middle, right)
+        let lanes = [100, 250, 400]; // x positions for each lane
+        let tiltControl = false;
+        let soundOn = true;
+        
+        // Arrays for game objects
+        let roadLines = [];
+        let trees = [];
+        let rivers = [];
+        let otherCars = [];
+        let trucks = [];
+        
+        // Set canvas dimensions
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Update player position based on new canvas size
+            playerX = canvas.width / 2 - 60;
+            playerY = canvas.height - 250;
+            
+            // Update lane positions
+            lanes = [
+                canvas.width * 0.2,
+                canvas.width * 0.5 - 60,
+                canvas.width * 0.8 - 120
+            ];
+            
+            // Reset player position to middle lane
+            playerLane = 2;
+            playerX = lanes[playerLane - 1];
+        }
+        
+        // Initialize game objects
+        function initGame() {
+            score = 0;
+            gameSpeed = 5;
+            playerSpeed = 5;
+            playerLane = 2;
+            playerX = lanes[playerLane - 1];
+            
+            // Initialize road lines
+            roadLines = [];
+            for (let i = 0; i < 10; i++) {
+                roadLines.push({
+                    x: canvas.width / 2 - 5,
+                    y: -100 + i * 100,
+                    width: 10,
+                    height: 40
+                });
+            }
+            
+            // Initialize trees
+            trees = [];
+            for (let i = 0; i < 8; i++) {
+                trees.push({
+                    x: Math.random() * canvas.width * 0.2,
+                    y: -200 + i * 250,
+                    width: 60,
+                    height: 120
+                });
+                
+                trees.push({
+                    x: canvas.width * 0.8 + Math.random() * canvas.width * 0.2,
+                    y: -300 + i * 250,
+                    width: 60,
+                    height: 120
+                });
+            }
+            
+            // Initialize rivers
+            rivers = [];
+            rivers.push({
+                x: canvas.width * 0.05,
+                y: -100,
+                width: canvas.width * 0.15,
+                height: 800
+            });
+            
+            rivers.push({
+                x: canvas.width * 0.85,
+                y: -500,
+                width: canvas.width * 0.15,
+                height: 800
+            });
+            
+            // Initialize other cars
+            otherCars = [];
+            for (let i = 0; i < 5; i++) {
+                const lane = Math.floor(Math.random() * 3) + 1;
+                const colors = ['#FF3333', '#3333FF', '#FFAA33', '#33FF33', '#FF33FF'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                otherCars.push({
+                    x: lanes[lane - 1],
+                    y: -300 - i * 400,
+                    lane: lane,
+                    color: color,
+                    width: 100,
+                    height: 200,
+                    speed: 4 + Math.random() * 3
+                });
+            }
+            
+            // Initialize trucks
+            trucks = [];
+            for (let i = 0; i < 2; i++) {
+                const lane = Math.floor(Math.random() * 3) + 1;
+                
+                trucks.push({
+                    x: lanes[lane - 1],
+                    y: -800 - i * 600,
+                    lane: lane,
+                    color: '#888888',
+                    width: 120,
+                    height: 250,
+                    speed: 3 + Math.random() * 2
+                });
+            }
+        }
+        
+        // Draw player car
+        function drawPlayerCar() {
+            // Car body
+            ctx.fillStyle = '#000';
+            ctx.fillRect(playerX, playerY, 120, 240);
+            
+            // Car top
+            ctx.fillStyle = '#000';
+            ctx.fillRect(playerX + 12, playerY + 24, 96, 96);
+            
+            // Window
+            ctx.fillStyle = '#1a5276';
+            ctx.fillRect(playerX + 18, playerY + 48, 84, 72);
+            
+            // Mercedes logo
+            ctx.fillStyle = 'silver';
+            ctx.beginPath();
+            ctx.arc(playerX + 60, playerY + 12, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('A', playerX + 60, playerY + 16);
+            
+            // Car name
+            ctx.fillStyle = 'silver';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('JAYAN KRITIK', playerX + 60, playerY + 200);
+            
+            // Back seat text
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Back seat', playerX + 12, playerY + 220);
+            
+            // Wheels
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(playerX + 30, playerY + 220, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(playerX + 90, playerY + 220, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Wheel details
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.arc(playerX + 30, playerY + 220, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(playerX + 90, playerY + 220, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Draw other cars
+        function drawOtherCars() {
+            // Regular cars
+            otherCars.forEach(car => {
+                ctx.fillStyle = car.color;
+                ctx.fillRect(car.x, car.y, car.width, car.height);
+                
+                // Windows
+                ctx.fillStyle = '#1a5276';
+                ctx.fillRect(car.x + 10, car.y + 20, car.width - 20, 40);
+                
+                // Wheels
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(car.x + 20, car.y + car.height - 20, 12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(car.x + car.width - 20, car.y + car.height - 20, 12, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Trucks
+            trucks.forEach(truck => {
+                ctx.fillStyle = truck.color;
+                ctx.fillRect(truck.x, truck.y, truck.width, truck.height);
+                
+                // Truck cabin
+                ctx.fillStyle = '#555';
+                ctx.fillRect(truck.x + 80, truck.y + 20, 30, 60);
+                
+                // Windows
+                ctx.fillStyle = '#1a5276';
+                ctx.fillRect(truck.x + 85, truck.y + 25, 20, 20);
+                
+                // Wheels
+                ctx.fillStyle = '#333';
+                for (let i = 0; i < 4; i++) {
+                    ctx.beginPath();
+                    ctx.arc(truck.x + 20 + i * 30, truck.y + truck.height - 20, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+        
+        // Draw environment
+        function drawEnvironment() {
+            // Sky
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#1E90FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Grass
+            ctx.fillStyle = '#2d5a27';
+            ctx.fillRect(0, 0, canvas.width * 0.2, canvas.height);
+            ctx.fillRect(canvas.width * 0.8, 0, canvas.width * 0.2, canvas.height);
+            
+            // Rivers
+            rivers.forEach(river => {
+                ctx.fillStyle = '#1e90ff';
+                ctx.fillRect(river.x, river.y, river.width, river.height);
+                
+                // River waves
+                ctx.strokeStyle = '#4da6ff';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.arc(river.x + river.width/2, river.y + 50 + i * 100, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+            
+            // Road
+            ctx.fillStyle = '#555';
+            ctx.fillRect(canvas.width * 0.2, 0, canvas.width * 0.6, canvas.height);
+            
+            // Road lines
+            ctx.fillStyle = '#fff';
+            roadLines.forEach(line => {
+                ctx.fillRect(line.x, line.y, line.width, line.height);
+            });
+            
+            // Trees
+            trees.forEach(tree => {
+                // Tree top
+                ctx.fillStyle = '#2d5a27';
+                ctx.beginPath();
+                ctx.ellipse(tree.x + tree.width/2, tree.y + tree.height/2, tree.width/2, tree.height/2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Tree trunk
+                ctx.fillStyle = '#8b4513';
+                ctx.fillRect(tree.x + tree.width/2 - 7.5, tree.y + tree.height, 15, 40);
+            });
+        }
+        
+        // Update game objects
+        function updateGame() {
+            if (!gameRunning) return;
+            
+            // Move road lines
+            roadLines.forEach(line => {
+                line.y += gameSpeed;
+                if (line.y > canvas.height) {
+                    line.y = -100;
+                }
+            });
+            
+            // Move trees
+            trees.forEach(tree => {
+                tree.y += gameSpeed * 0.7;
+                if (tree.y > canvas.height) {
+                    tree.y = -200;
+                    tree.x = Math.random() < 0.5 ? 
+                             Math.random() * canvas.width * 0.2 : 
+                             canvas.width * 0.8 + Math.random() * canvas.width * 0.2;
+                }
+            });
+            
+            // Move rivers
+            rivers.forEach(river => {
+                river.y += gameSpeed * 0.5;
+                if (river.y > canvas.height) {
+                    river.y = -800;
+                }
+            });
+            
+            // Move other cars
+            otherCars.forEach(car => {
+                car.y += car.speed;
+                
+                // Score when passing a car
+                if (car.y > canvas.height && !car.passed) {
+                    car.passed = true;
+                    score += 1;
+                    scoreDisplay.textContent = score;
+                }
+                
+                // Reset car position when off screen
+                if (car.y > canvas.height + 300) {
+                    car.y = -300;
+                    car.lane = Math.floor(Math.random() * 3) + 1;
+                    car.x = lanes[car.lane - 1];
+                    car.speed = 4 + Math.random() * 3;
+                    car.passed = false;
+                    
+                    // Random color
+                    const colors = ['#FF3333', '#3333FF', '#FFAA33', '#33FF33', '#FF33FF'];
+                    car.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                
+                // Check collision with player
+                if (checkCollision(playerX, playerY, 120, 240, car.x, car.y, car.width, car.height)) {
+                    gameOver();
+                }
+            });
+            
+            // Move trucks
+            trucks.forEach(truck => {
+                truck.y += truck.speed;
+                
+                // Score when passing a truck
+                if (truck.y > canvas.height && !truck.passed) {
+                    truck.passed = true;
+                    score += 2;
+                    scoreDisplay.textContent = score;
+                }
+                
+                // Reset truck position when off screen
+                if (truck.y > canvas.height + 300) {
+                    truck.y = -800;
+                    truck.lane = Math.floor(Math.random() * 3) + 1;
+                    truck.x = lanes[truck.lane - 1];
+                    truck.speed = 3 + Math.random() * 2;
+                    truck.passed = false;
+                }
+                
+                // Check collision with player
+                if (checkCollision(playerX, playerY, 120, 240, truck.x, truck.y, truck.width, truck.height)) {
+                    gameOver();
+                }
+            });
+            
+            // Update player position based on lane
+            const targetX = lanes[playerLane - 1];
+            playerX += (targetX - playerX) * 0.1;
+            
+            // Gradually increase game speed
+            gameSpeed = 5 + score * 0.05;
+        }
+        
+        // Check collision between two rectangles
+        function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+            return x1 < x2 + w2 &&
+                   x1 + w1 > x2 &&
+                   y1 < y2 + h2 &&
+                   y1 + h1 > y2;
+        }
+        
+        // Game over function
+        function gameOver() {
+            gameRunning = false;
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'flex';
+            
+            if (soundOn) {
+                crashSound.currentTime = 0;
+                crashSound.play();
+                engineSound.pause();
+            }
+        }
+        
+        // Main game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw game elements
+            drawEnvironment();
+            drawOtherCars();
+            drawPlayerCar();
+            
+            // Update game logic
+            updateGame();
+            
+            // Continue game loop
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // Start the game
+        function startGame() {
+            gameMenu.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            gameRunning = true;
+            initGame();
+            
+            if (soundOn) {
+                engineSound.currentTime = 0;
+                engineSound.play();
+            }
+            
+            gameLoop();
+        }
+        
+        // Restart the game
+        function restartGame() {
+            startGame();
+        }
+        
+        // Tilt controls
+        function handleDeviceOrientation(e) {
+            if (!tiltControl || !gameRunning) return;
+            
+            // Get gamma (left/right tilt) value
+            const tilt = e.gamma;
+            
+            // Convert tilt to lane changes
+            if (tilt < -15 && playerLane > 1) {
+                playerLane = 1;
+            } else if (tilt > 15 && playerLane < 3) {
+                playerLane = 3;
+            } else if (tilt >= -15 && tilt <= 15) {
+                playerLane = 2;
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        playAgainBtn.addEventListener('click', restartGame);
+        menuBtn.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            gameMenu.style.display = 'flex';
+        });
+        
+        // Brake button
+        brakeBtn.addEventListener('touchstart', () => {
+            if (!gameRunning) return;
+            
+            gameSpeed = Math.max(2, gameSpeed - 0.5);
+            playerSpeed = Math.max(2, playerSpeed - 0.5);
+            
+            if (soundOn) {
+                brakeSound.currentTime = 0;
+                brakeSound.play();
+            }
+        });
+        
+        brakeBtn.addEventListener('touchend', () => {
+            if (!gameRunning) return;
+            gameSpeed = 5 + score * 0.05;
+            playerSpeed = 5;
+        });
+        
+        // Accelerate button
+        accelerateBtn.addEventListener('touchstart', () => {
+            if (!gameRunning) return;
+            
+            gameSpeed = Math.min(15, gameSpeed + 0.5);
+            playerSpeed = Math.min(15, playerSpeed + 0.5);
+            
+            if (soundOn) {
+                accelerateSound.currentTime = 0;
+                accelerateSound.play();
+            }
+        });
+        
+        accelerateBtn.addEventListener('touchend', () => {
+            if (!gameRunning) return;
+            gameSpeed = 5 + score * 0.05;
+            playerSpeed = 5;
+        });
+        
+        // Mobile tilt controls toggle
+        window.addEventListener('deviceorientation', handleDeviceOrientation);
+        
+        // Toggle sound
+        soundToggle.addEventListener('click', () => {
+            soundOn = !soundOn;
+            if (soundOn) {
+                soundToggle.innerHTML = '<i class="fas fa-volume-up"></i> SOUND ON';
+                if (gameRunning) {
+                    engineSound.play();
+                }
+            } else {
+                soundToggle.innerHTML = '<i class="fas fa-volume-mute"></i> SOUND OFF';
+                engineSound.pause();
+                accelerateSound.pause();
+                brakeSound.pause();
+            }
+        });
+        
+        // Keyboard controls for testing on desktop
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                    if (playerLane > 1) playerLane--;
+                    break;
+                case 'ArrowRight':
+                    if (playerLane < 3) playerLane++;
+                    break;
+                case 'ArrowUp':
+                    gameSpeed = Math.min(15, gameSpeed + 2);
+                    playerSpeed = Math.min(15, playerSpeed + 2);
+                    break;
+                case 'ArrowDown':
+                    gameSpeed = Math.max(2, gameSpeed - 2);
+                    playerSpeed = Math.max(2, playerSpeed - 2);
+                    break;
+            }
+        });
+        
+        // Initialize canvas and game
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        initGame();
+        
+        // Draw initial screen
+        drawEnvironment();
+        drawPlayerCar();
+        
+        // Enable tilt controls if on mobile
+        if ('ontouchstart' in window) {
+            tiltControl = true;
+        }
+    </script>
+</body>
+</html>
