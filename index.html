@@ -37,34 +37,34 @@
             border: 2px solid gold; 
         }
         
-        /* Control Buttons - MOVED TO SIDES */
-        .controls { 
-            position: absolute; bottom: 20px; width: 100%; 
-            display: flex; justify-content: space-between; 
-            padding: 0 15px; z-index: 5; 
+        /* Left Side Controls (Brake on top, Left below) */
+        .left-controls { 
+            position: absolute; left: 20px; bottom: 20px; 
+            display: flex; flex-direction: column; align-items: center;
+            gap: 15px; z-index: 5;
         }
-        .control-btn { 
-            width: 60px; height: 60px; border-radius: 50%; 
-            background: rgba(0,0,0,0.8); border: 2px solid white; 
-            display: flex; align-items: center; justify-content: center; 
-            color: white; font-size: 1.5rem; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
-        }
-        .brake-btn { color: #ff5555; border-color: #ff5555; }
-        .accelerate-btn { color: #55ff55; border-color: #55ff55; }
         
-        /* Left/Right Buttons - NEW POSITION (between brake/speed buttons) */
-        .steering-controls { 
-            position: absolute; bottom: 90px; width: 100%; 
-            display: flex; justify-content: center; gap: 100px; 
-            z-index: 5; 
+        /* Right Side Controls (Speed on top, Right below) */
+        .right-controls { 
+            position: absolute; right: 20px; bottom: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 15px; z-index: 5;
         }
-        .steer-btn { 
-            width: 50px; height: 50px; border-radius: 50%; 
-            background: rgba(0,0,0,0.8); border: 2px solid #4d94ff; 
-            color: #4d94ff; font-size: 1.3rem; 
+        
+        /* Control Buttons */
+        .control-btn { 
+            width: 70px; height: 70px; border-radius: 50%; 
+            background: rgba(0,0,0,0.85); border: 3px solid white; 
             display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 1.7rem; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.7); 
         }
+        
+        /* Different colors for different buttons */
+        .brake-btn { color: #ff5555; border-color: #ff5555; }
+        .left-btn { color: #4d94ff; border-color: #4d94ff; }
+        .right-btn { color: #4d94ff; border-color: #4d94ff; }
+        .accelerate-btn { color: #55ff55; border-color: #55ff55; }
         
         .speed-indicator { 
             position: absolute; top: 50px; left: 10px; 
@@ -72,18 +72,35 @@
             border-radius: 8px; font-size: 0.9rem; color: white; 
         }
         
+        /* Instructions */
+        .instructions {
+            position: absolute; bottom: 180px; width: 100%;
+            text-align: center; color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem; padding: 0 20px;
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .game-title { font-size: 1.5rem; }
             .menu-btn { padding: 8px 16px; font-size: 0.9rem; }
-            .control-btn { width: 55px; height: 55px; font-size: 1.3rem; }
-            .steer-btn { width: 45px; height: 45px; font-size: 1.2rem; }
-            .steering-controls { gap: 80px; bottom: 85px; }
+            .control-btn { width: 65px; height: 65px; font-size: 1.5rem; }
+            .left-controls, .right-controls { gap: 12px; }
+            .left-controls { left: 15px; bottom: 15px; }
+            .right-controls { right: 15px; bottom: 15px; }
+            .instructions { bottom: 160px; font-size: 0.8rem; }
         }
+        
         @media (max-width: 480px) {
-            .control-btn { width: 50px; height: 50px; }
-            .steer-btn { width: 40px; height: 40px; }
-            .steering-controls { gap: 70px; bottom: 80px; }
+            .control-btn { width: 60px; height: 60px; font-size: 1.4rem; }
+            .left-controls, .right-controls { gap: 10px; }
+            .left-controls { left: 10px; bottom: 10px; }
+            .right-controls { right: 10px; bottom: 10px; }
+            .instructions { bottom: 150px; font-size: 0.75rem; }
+        }
+        
+        @media (max-height: 700px) {
+            .left-controls, .right-controls { bottom: 10px; }
+            .instructions { bottom: 130px; }
         }
     </style>
 </head>
@@ -97,9 +114,12 @@
         <button class="menu-btn" id="soundToggle">
             <i class="fas fa-volume-up"></i> SOUND ON
         </button>
-        <p style="margin-top: 20px; color: #ccc; font-size: 0.9rem; padding: 0 20px;">
-            Use left/right buttons to steer | Brake (left) | Accelerate (right)
-        </p>
+        <div class="instructions">
+            <p><span style="color:#ff5555">◀ BRAKE (Top Left)</span> | 
+               <span style="color:#4d94ff">◀ LEFT (Bottom Left)</span></p>
+            <p><span style="color:#55ff55">SPEED (Top Right) ▶</span> | 
+               <span style="color:#4d94ff">RIGHT (Bottom Right) ▶</span></p>
+        </div>
     </div>
     
     <!-- Game Canvas -->
@@ -109,19 +129,29 @@
     <div class="score-display">SCORE: <span id="score">0</span></div>
     <div class="speed-indicator">SPEED: <span id="speedValue">50</span> km/h</div>
     
-    <!-- Steering Controls - BETWEEN BRAKE/SPEED BUTTONS -->
-    <div class="steering-controls">
-        <div class="steer-btn" id="leftBtn"><i class="fas fa-arrow-left"></i></div>
-        <div class="steer-btn" id="rightBtn"><i class="fas fa-arrow-right"></i></div>
-    </div>
-    
-    <!-- Brake & Accelerate Buttons - AT BOTTOM SIDES -->
-    <div class="controls">
+    <!-- LEFT SIDE CONTROLS -->
+    <div class="left-controls">
+        <!-- Brake Button - TOP LEFT -->
         <div class="control-btn brake-btn" id="brakeBtn">
             <i class="fas fa-hand-paper"></i>
         </div>
+        
+        <!-- Left Button - BELOW BRAKE -->
+        <div class="control-btn left-btn" id="leftBtn">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+    
+    <!-- RIGHT SIDE CONTROLS -->
+    <div class="right-controls">
+        <!-- Speed Button - TOP RIGHT -->
         <div class="control-btn accelerate-btn" id="accelerateBtn">
             <i class="fas fa-bolt"></i>
+        </div>
+        
+        <!-- Right Button - BELOW SPEED -->
+        <div class="control-btn right-btn" id="rightBtn">
+            <i class="fas fa-arrow-right"></i>
         </div>
     </div>
     
@@ -176,7 +206,7 @@
         let isBraking = false;
         let isAccelerating = false;
         
-        // Car Sizes (SMALLER AND MORE REALISTIC)
+        // Car Sizes
         const PLAYER_CAR_WIDTH = 45;
         const PLAYER_CAR_HEIGHT = 90;
         const OTHER_CAR_WIDTH = 40;
@@ -200,7 +230,7 @@
             
             playerLane = 2;
             playerX = lanes[playerLane - 1];
-            playerY = canvas.height * 0.7; // গাড়ি আরও সামনে
+            playerY = canvas.height * 0.7;
         }
         
         // Initialize Game
@@ -253,9 +283,9 @@
             }
         }
         
-        // Draw Player Car - MORE REALISTIC 2D
+        // Draw Player Car
         function drawPlayerCar() {
-            // Car Body (More realistic shape)
+            // Car Body
             ctx.fillStyle = '#000000';
             ctx.beginPath();
             ctx.roundRect(playerX, playerY, PLAYER_CAR_WIDTH, PLAYER_CAR_HEIGHT, 5);
@@ -288,7 +318,7 @@
             ctx.arc(playerX + PLAYER_CAR_WIDTH - 8, playerY + PLAYER_CAR_HEIGHT - 15, 3, 0, Math.PI*2);
             ctx.fill();
             
-            // Wheels (More realistic)
+            // Wheels
             ctx.fillStyle = '#222';
             ctx.beginPath();
             ctx.arc(playerX + 12, playerY + PLAYER_CAR_HEIGHT - 8, 7, 0, Math.PI*2);
@@ -318,7 +348,7 @@
             ctx.fillText('Back seat', playerX + 5, playerY + PLAYER_CAR_HEIGHT - 5);
         }
         
-        // Draw Other Cars - MORE REALISTIC
+        // Draw Other Cars
         function drawOtherCars() {
             otherCars.forEach(car => {
                 // Car Body
@@ -368,7 +398,7 @@
                 ctx.fillStyle = '#1a5276';
                 ctx.fillRect(truck.x + truck.width * 0.72, truck.y + 8, truck.width * 0.26, 10);
                 
-                // Wheels (Multiple)
+                // Wheels
                 ctx.fillStyle = '#222';
                 for(let i = 0; i < 3; i++) {
                     ctx.beginPath();
@@ -387,7 +417,7 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Mountains in distance
+            // Mountains
             ctx.fillStyle = '#2d5a27';
             ctx.beginPath();
             ctx.moveTo(0, canvas.height * 0.3);
@@ -417,7 +447,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
             
-            // Road lines (short dashes)
+            // Road lines
             roadLines.forEach(line => {
                 ctx.fillRect(line.x, line.y, line.width, line.height);
             });
@@ -594,11 +624,13 @@
         accelerateBtn.addEventListener('mouseup', stopAccelerating);
         accelerateBtn.addEventListener('mouseleave', stopAccelerating);
         
-        // Left/Right Buttons
+        // Left Button
         leftBtn.addEventListener('touchstart', (e) => { 
             e.preventDefault(); 
             if (gameRunning && playerLane > 1) playerLane--; 
         });
+        
+        // Right Button
         rightBtn.addEventListener('touchstart', (e) => { 
             e.preventDefault(); 
             if (gameRunning && playerLane < 3) playerLane++; 
@@ -641,21 +673,6 @@
         window.addEventListener('load', () => {
             resizeCanvas();
             drawEnvironment();
-            // Add roundRect support
-            if (!CanvasRenderingContext2D.prototype.roundRect) {
-                CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                    if (w < 2 * r) r = w / 2;
-                    if (h < 2 * r) r = h / 2;
-                    this.beginPath();
-                    this.moveTo(x + r, y);
-                    this.arcTo(x + w, y, x + w, y + h, r);
-                    this.arcTo(x + w, y + h, x, y + h, r);
-                    this.arcTo(x, y + h, x, y, r);
-                    this.arcTo(x, y, x + w, y, r);
-                    this.closePath();
-                    return this;
-                }
-            }
         });
     </script>
 </body>
