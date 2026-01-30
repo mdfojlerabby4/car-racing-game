@@ -37,34 +37,47 @@
             border: 2px solid gold; 
         }
         
-        /* Left Side Controls (Brake on top, Left below) */
-        .left-controls { 
-            position: absolute; left: 20px; bottom: 20px; 
-            display: flex; flex-direction: column; align-items: center;
-            gap: 15px; z-index: 5;
+        /* Control Buttons - TWO COLUMNS */
+        .controls-container {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 5;
         }
         
-        /* Right Side Controls (Speed on top, Right below) */
-        .right-controls { 
-            position: absolute; right: 20px; bottom: 20px;
-            display: flex; flex-direction: column; align-items: center;
-            gap: 15px; z-index: 5;
+        /* Left Column */
+        .left-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
         }
         
-        /* Control Buttons */
+        /* Right Column */
+        .right-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 15px;
+        }
+        
+        /* ALL BUTTONS SAME STYLE */
         .control-btn { 
-            width: 70px; height: 70px; border-radius: 50%; 
-            background: rgba(0,0,0,0.85); border: 3px solid white; 
+            width: 65px; height: 65px; border-radius: 50%; 
+            background: rgba(0,0,0,0.8); border: 3px solid white; 
             display: flex; align-items: center; justify-content: center; 
-            color: white; font-size: 1.7rem; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.7); 
+            color: white; font-size: 1.6rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6); 
         }
         
         /* Different colors for different buttons */
         .brake-btn { color: #ff5555; border-color: #ff5555; }
+        .accelerate-btn { color: #55ff55; border-color: #55ff55; }
         .left-btn { color: #4d94ff; border-color: #4d94ff; }
         .right-btn { color: #4d94ff; border-color: #4d94ff; }
-        .accelerate-btn { color: #55ff55; border-color: #55ff55; }
         
         .speed-indicator { 
             position: absolute; top: 50px; left: 10px; 
@@ -83,24 +96,20 @@
         @media (max-width: 768px) {
             .game-title { font-size: 1.5rem; }
             .menu-btn { padding: 8px 16px; font-size: 0.9rem; }
-            .control-btn { width: 65px; height: 65px; font-size: 1.5rem; }
-            .left-controls, .right-controls { gap: 12px; }
-            .left-controls { left: 15px; bottom: 15px; }
-            .right-controls { right: 15px; bottom: 15px; }
+            .control-btn { width: 60px; height: 60px; font-size: 1.4rem; }
+            .controls-container { bottom: 90px; }
             .instructions { bottom: 160px; font-size: 0.8rem; }
         }
         
         @media (max-width: 480px) {
-            .control-btn { width: 60px; height: 60px; font-size: 1.4rem; }
-            .left-controls, .right-controls { gap: 10px; }
-            .left-controls { left: 10px; bottom: 10px; }
-            .right-controls { right: 10px; bottom: 10px; }
+            .control-btn { width: 55px; height: 55px; font-size: 1.3rem; }
+            .controls-container { bottom: 80px; padding: 0 10px; }
             .instructions { bottom: 150px; font-size: 0.75rem; }
         }
         
         @media (max-height: 700px) {
-            .left-controls, .right-controls { bottom: 10px; }
-            .instructions { bottom: 130px; }
+            .controls-container { bottom: 70px; }
+            .instructions { bottom: 140px; }
         }
     </style>
 </head>
@@ -115,10 +124,12 @@
             <i class="fas fa-volume-up"></i> SOUND ON
         </button>
         <div class="instructions">
-            <p><span style="color:#ff5555">◀ BRAKE (Top Left)</span> | 
-               <span style="color:#4d94ff">◀ LEFT (Bottom Left)</span></p>
-            <p><span style="color:#55ff55">SPEED (Top Right) ▶</span> | 
-               <span style="color:#4d94ff">RIGHT (Bottom Right) ▶</span></p>
+            <p><span style="color:#ff5555">BRAKE</span> | 
+               <span style="color:#4d94ff">LEFT</span> | 
+               <span style="color:#4d94ff">RIGHT</span> | 
+               <span style="color:#55ff55">SPEED</span></p>
+            <p>Bam pase: Break (upore), Left (niche)<br>
+               Dan pase: Speed (upore), Right (niche)</p>
         </div>
     </div>
     
@@ -129,29 +140,32 @@
     <div class="score-display">SCORE: <span id="score">0</span></div>
     <div class="speed-indicator">SPEED: <span id="speedValue">50</span> km/h</div>
     
-    <!-- LEFT SIDE CONTROLS -->
-    <div class="left-controls">
-        <!-- Brake Button - TOP LEFT -->
-        <div class="control-btn brake-btn" id="brakeBtn">
-            <i class="fas fa-hand-paper"></i>
+    <!-- CONTROL BUTTONS IN TWO COLUMNS -->
+    <div class="controls-container">
+        <!-- Left Column -->
+        <div class="left-controls">
+            <!-- Brake Button - Top -->
+            <div class="control-btn brake-btn" id="brakeBtn">
+                <i class="fas fa-hand-paper"></i>
+            </div>
+            
+            <!-- Left Button - Bottom -->
+            <div class="control-btn left-btn" id="leftBtn">
+                <i class="fas fa-arrow-left"></i>
+            </div>
         </div>
         
-        <!-- Left Button - BELOW BRAKE -->
-        <div class="control-btn left-btn" id="leftBtn">
-            <i class="fas fa-arrow-left"></i>
-        </div>
-    </div>
-    
-    <!-- RIGHT SIDE CONTROLS -->
-    <div class="right-controls">
-        <!-- Speed Button - TOP RIGHT -->
-        <div class="control-btn accelerate-btn" id="accelerateBtn">
-            <i class="fas fa-bolt"></i>
-        </div>
-        
-        <!-- Right Button - BELOW SPEED -->
-        <div class="control-btn right-btn" id="rightBtn">
-            <i class="fas fa-arrow-right"></i>
+        <!-- Right Column -->
+        <div class="right-controls">
+            <!-- Accelerate Button - Top -->
+            <div class="control-btn accelerate-btn" id="accelerateBtn">
+                <i class="fas fa-bolt"></i>
+            </div>
+            
+            <!-- Right Button - Bottom -->
+            <div class="control-btn right-btn" id="rightBtn">
+                <i class="fas fa-arrow-right"></i>
+            </div>
         </div>
     </div>
     
@@ -206,13 +220,13 @@
         let isBraking = false;
         let isAccelerating = false;
         
-        // Car Sizes
-        const PLAYER_CAR_WIDTH = 45;
-        const PLAYER_CAR_HEIGHT = 90;
-        const OTHER_CAR_WIDTH = 40;
-        const OTHER_CAR_HEIGHT = 80;
-        const TRUCK_WIDTH = 55;
-        const TRUCK_HEIGHT = 110;
+        // Car Sizes - SMALLER
+        const PLAYER_CAR_WIDTH = 40;  // Reduced from 45
+        const PLAYER_CAR_HEIGHT = 80; // Reduced from 90
+        const OTHER_CAR_WIDTH = 35;   // Reduced from 40
+        const OTHER_CAR_HEIGHT = 70;  // Reduced from 80
+        const TRUCK_WIDTH = 50;       // Reduced from 55
+        const TRUCK_HEIGHT = 100;     // Reduced from 110
         
         // Game Objects
         let roadLines = [], trees = [], rivers = [], otherCars = [], trucks = [];
@@ -288,7 +302,11 @@
             // Car Body
             ctx.fillStyle = '#000000';
             ctx.beginPath();
-            ctx.roundRect(playerX, playerY, PLAYER_CAR_WIDTH, PLAYER_CAR_HEIGHT, 5);
+            if (ctx.roundRect) {
+                ctx.roundRect(playerX, playerY, PLAYER_CAR_WIDTH, PLAYER_CAR_HEIGHT, 5);
+            } else {
+                ctx.rect(playerX, playerY, PLAYER_CAR_WIDTH, PLAYER_CAR_HEIGHT);
+            }
             ctx.fill();
             
             // Car Roof
@@ -302,7 +320,7 @@
             // Mercedes Logo
             ctx.fillStyle = 'silver';
             ctx.beginPath();
-            ctx.arc(playerX + PLAYER_CAR_WIDTH/2, playerY + 5, 4, 0, Math.PI*2);
+            ctx.arc(playerX + PLAYER_CAR_WIDTH/2, playerY + 5, 3, 0, Math.PI*2);
             ctx.fill();
             
             // Front Grill
@@ -312,40 +330,40 @@
             // Headlights
             ctx.fillStyle = '#FFDD00';
             ctx.beginPath();
-            ctx.arc(playerX + 8, playerY + PLAYER_CAR_HEIGHT - 15, 3, 0, Math.PI*2);
+            ctx.arc(playerX + 8, playerY + PLAYER_CAR_HEIGHT - 15, 2, 0, Math.PI*2);
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(playerX + PLAYER_CAR_WIDTH - 8, playerY + PLAYER_CAR_HEIGHT - 15, 3, 0, Math.PI*2);
+            ctx.arc(playerX + PLAYER_CAR_WIDTH - 8, playerY + PLAYER_CAR_HEIGHT - 15, 2, 0, Math.PI*2);
             ctx.fill();
             
             // Wheels
             ctx.fillStyle = '#222';
             ctx.beginPath();
-            ctx.arc(playerX + 12, playerY + PLAYER_CAR_HEIGHT - 8, 7, 0, Math.PI*2);
+            ctx.arc(playerX + 10, playerY + PLAYER_CAR_HEIGHT - 8, 6, 0, Math.PI*2);
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(playerX + PLAYER_CAR_WIDTH - 12, playerY + PLAYER_CAR_HEIGHT - 8, 7, 0, Math.PI*2);
+            ctx.arc(playerX + PLAYER_CAR_WIDTH - 10, playerY + PLAYER_CAR_HEIGHT - 8, 6, 0, Math.PI*2);
             ctx.fill();
             
             // Wheel Rims
             ctx.fillStyle = '#555';
             ctx.beginPath();
-            ctx.arc(playerX + 12, playerY + PLAYER_CAR_HEIGHT - 8, 3, 0, Math.PI*2);
+            ctx.arc(playerX + 10, playerY + PLAYER_CAR_HEIGHT - 8, 2.5, 0, Math.PI*2);
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(playerX + PLAYER_CAR_WIDTH - 12, playerY + PLAYER_CAR_HEIGHT - 8, 3, 0, Math.PI*2);
+            ctx.arc(playerX + PLAYER_CAR_WIDTH - 10, playerY + PLAYER_CAR_HEIGHT - 8, 2.5, 0, Math.PI*2);
             ctx.fill();
             
             // Car Text
             ctx.fillStyle = 'silver';
-            ctx.font = 'bold 9px Arial';
+            ctx.font = 'bold 8px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('JAYAN', playerX + PLAYER_CAR_WIDTH/2, playerY + PLAYER_CAR_HEIGHT - 30);
-            ctx.fillText('KRITIK', playerX + PLAYER_CAR_WIDTH/2, playerY + PLAYER_CAR_HEIGHT - 20);
+            ctx.fillText('JAYAN', playerX + PLAYER_CAR_WIDTH/2, playerY + PLAYER_CAR_HEIGHT - 25);
+            ctx.fillText('KRITIK', playerX + PLAYER_CAR_WIDTH/2, playerY + PLAYER_CAR_HEIGHT - 16);
             
-            ctx.font = 'bold 7px Arial';
+            ctx.font = 'bold 6px Arial';
             ctx.textAlign = 'left';
-            ctx.fillText('Back seat', playerX + 5, playerY + PLAYER_CAR_HEIGHT - 5);
+            ctx.fillText('Mercedes', playerX + 5, playerY + PLAYER_CAR_HEIGHT - 5);
         }
         
         // Draw Other Cars
@@ -353,30 +371,34 @@
             otherCars.forEach(car => {
                 // Car Body
                 ctx.fillStyle = car.color;
-                ctx.beginPath();
-                ctx.roundRect(car.x, car.y, car.width, car.height, 4);
-                ctx.fill();
+                if (ctx.roundRect) {
+                    ctx.beginPath();
+                    ctx.roundRect(car.x, car.y, car.width, car.height, 4);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(car.x, car.y, car.width, car.height);
+                }
                 
                 // Windows
                 ctx.fillStyle = '#1a5276';
-                ctx.fillRect(car.x + 5, car.y + 8, car.width - 10, 15);
+                ctx.fillRect(car.x + 5, car.y + 8, car.width - 10, 14);
                 
                 // Wheels
                 ctx.fillStyle = '#222';
                 ctx.beginPath();
-                ctx.arc(car.x + 10, car.y + car.height - 8, 5, 0, Math.PI*2);
-                ctx.fill();
+                ctx.arc(car.x + 9, car.y + car.height - 8, 4, 0, Math.PI*2);
+                    ctx.fill();
                 ctx.beginPath();
-                ctx.arc(car.x + car.width - 10, car.y + car.height - 8, 5, 0, Math.PI*2);
+                ctx.arc(car.x + car.width - 9, car.y + car.height - 8, 4, 0, Math.PI*2);
                 ctx.fill();
                 
                 // Headlights
                 ctx.fillStyle = '#FFDD00';
                 ctx.beginPath();
-                ctx.arc(car.x + 8, car.y + car.height - 10, 2, 0, Math.PI*2);
+                ctx.arc(car.x + 7, car.y + car.height - 10, 1.5, 0, Math.PI*2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(car.x + car.width - 8, car.y + car.height - 10, 2, 0, Math.PI*2);
+                ctx.arc(car.x + car.width - 7, car.y + car.height - 10, 1.5, 0, Math.PI*2);
                 ctx.fill();
             });
             
@@ -396,13 +418,13 @@
                 
                 // Windows
                 ctx.fillStyle = '#1a5276';
-                ctx.fillRect(truck.x + truck.width * 0.72, truck.y + 8, truck.width * 0.26, 10);
+                ctx.fillRect(truck.x + truck.width * 0.72, truck.y + 8, truck.width * 0.26, 9);
                 
                 // Wheels
                 ctx.fillStyle = '#222';
                 for(let i = 0; i < 3; i++) {
                     ctx.beginPath();
-                    ctx.arc(truck.x + 15 + i*15, truck.y + truck.height - 8, 6, 0, Math.PI*2);
+                    ctx.arc(truck.x + 13 + i*13, truck.y + truck.height - 8, 5, 0, Math.PI*2);
                     ctx.fill();
                 }
             });
