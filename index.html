@@ -576,12 +576,12 @@
         let isRightPressed = false;
         
         // Car sizes - ছোট করা হয়েছে
-        const PLAYER_CAR_WIDTH = 35;  // পূর্বে 40 ছিল
-        const PLAYER_CAR_HEIGHT = 70; // পূর্বে 80 ছিল
-        const OTHER_CAR_WIDTH = 30;   // পূর্বে 35 ছিল
-        const OTHER_CAR_HEIGHT = 65;  // পূর্বে 70 ছিল
-        const TRUCK_WIDTH = 45;       // পূর্বে 50 ছিল
-        const TRUCK_HEIGHT = 90;      // পূর্বে 100 ছিল
+        const PLAYER_CAR_WIDTH = 35;
+        const PLAYER_CAR_HEIGHT = 70;
+        const OTHER_CAR_WIDTH = 30;
+        const OTHER_CAR_HEIGHT = 65;
+        const TRUCK_WIDTH = 45;
+        const TRUCK_HEIGHT = 90;
         
         // Arrays for game objects
         let roadLines = [];
@@ -603,7 +603,7 @@
             
             playerLane = 2;
             playerX = lanes[playerLane - 1];
-            playerY = canvas.height - PLAYER_CAR_HEIGHT - 20;
+            playerY = canvas.height - PLAYER_CAR_HEIGHT - 70; // এখানে 70 করেছি
         }
         
         // Initialize game objects
@@ -614,7 +614,7 @@
             playerSpeed = 5;
             playerLane = 2;
             playerX = lanes[playerLane - 1];
-            playerY = canvas.height - PLAYER_CAR_HEIGHT - 20;
+            playerY = canvas.height - PLAYER_CAR_HEIGHT - 70; // এখানেও 70 করেছি
             
             scoreDisplay.textContent = score;
             speedValueDisplay.textContent = Math.round(gameSpeed * 10);
@@ -724,19 +724,19 @@
             ctx.fill();
             
             ctx.fillStyle = '#000';
-            ctx.font = 'bold 5px Arial';  // ছোট করা হয়েছে
+            ctx.font = 'bold 5px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('A', playerX + PLAYER_CAR_WIDTH/2, playerY + 6);
             
             // Car name
             ctx.fillStyle = 'silver';
-            ctx.font = 'bold 7px Arial';  // ছোট করা হয়েছে
+            ctx.font = 'bold 7px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('JAYAN', playerX + PLAYER_CAR_WIDTH/2, playerY + PLAYER_CAR_HEIGHT - 22);
             ctx.fillText('KRITIK', playerX + PLAYER_CAR_WIDTH/2, playerY + PLAYER_CAR_HEIGHT - 13);
             
             // Back seat text
-            ctx.font = 'bold 5px Arial';  // ছোট করা হয়েছে
+            ctx.font = 'bold 5px Arial';
             ctx.textAlign = 'left';
             ctx.fillText('Back seat', playerX + 3, playerY + PLAYER_CAR_HEIGHT - 5);
             
@@ -885,11 +885,11 @@
             // Handle left/right movement
             if (isLeftPressed && playerLane > 1) {
                 playerLane--;
-                isLeftPressed = false; // Reset after one lane change
+                isLeftPressed = false;
             }
             if (isRightPressed && playerLane < 3) {
                 playerLane++;
-                isRightPressed = false; // Reset after one lane change
+                isRightPressed = false;
             }
             
             // Update player position based on lane
@@ -1139,7 +1139,7 @@
         function handleDeviceOrientation(e) {
             if (!tiltControl || !gameRunning) return;
             
-            const tilt = e.gamma; // Left/Right tilt (-90 to 90)
+            const tilt = e.gamma;
             
             if (tilt < -20 && playerLane > 1) {
                 playerLane = 1;
