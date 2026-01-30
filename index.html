@@ -673,9 +673,10 @@
                 height: 600
             });
             
-            // Initialize other cars - now for 4 lanes
+            // Initialize other cars - now for 4 lanes, but NOT in lane 4
             for (let i = 0; i < 6; i++) {
-                const lane = Math.floor(Math.random() * 4) + 1;
+                // Generate lane 1, 2, or 3 only (NOT 4)
+                const lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
                 const colors = ['#FF3333', '#3333FF', '#FFAA33', '#33FF33', '#FF33FF'];
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 
@@ -691,9 +692,10 @@
                 });
             }
             
-            // Initialize trucks - now for 4 lanes
+            // Initialize trucks - now for 4 lanes, but NOT in lane 4
             for (let i = 0; i < 3; i++) {
-                const lane = Math.floor(Math.random() * 4) + 1;
+                // Generate lane 1, 2, or 3 only (NOT 4)
+                const lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
                 
                 trucks.push({
                     x: lanes[lane - 1],
@@ -889,7 +891,7 @@
             
             // Update player position based on lane with 50% shift
             const targetX = lanes[playerLane - 1];
-            playerX += (targetX - playerX) * 0.5; // 50% shift (আধা শিফট)
+            playerX += (targetX - playerX) * 0.5; // 50% shift
             
             // Move road lines
             roadLines.forEach(line => {
@@ -932,7 +934,8 @@
                 // Reset car position when off screen
                 if (car.y > canvas.height + 200) {
                     car.y = -200;
-                    car.lane = Math.floor(Math.random() * 4) + 1; // 4 lanes
+                    // Generate lane 1, 2, or 3 only (NOT 4)
+                    car.lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
                     car.x = lanes[car.lane - 1];
                     car.speed = 4 + Math.random() * 3;
                     car.passed = false;
@@ -962,7 +965,8 @@
                 // Reset truck position when off screen
                 if (truck.y > canvas.height + 200) {
                     truck.y = -600;
-                    truck.lane = Math.floor(Math.random() * 4) + 1; // 4 lanes
+                    // Generate lane 1, 2, or 3 only (NOT 4)
+                    truck.lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
                     truck.x = lanes[truck.lane - 1];
                     truck.speed = 3 + Math.random() * 2;
                     truck.passed = false;
@@ -1084,41 +1088,21 @@
             isAccelerating = false;
         }
         
-        // Move left function - now moves 50% of lane width
+        // Move left function
         function moveLeft() {
             if (!gameRunning) return;
             
-            // Calculate target position based on 50% shift
-            const currentTargetX = lanes[playerLane - 1];
-            const laneIndex = playerLane - 1;
-            
-            // If not already at leftmost position
-            if (laneIndex > 0) {
-                // Move 50% towards left lane
-                const leftLaneX = lanes[laneIndex - 1];
-                const shiftAmount = (leftLaneX - currentTargetX) * 0.5; // 50% shift
-                
-                // Update player's target position
-                lanes[playerLane - 1] = currentTargetX + shiftAmount;
+            if (playerLane > 1) {
+                playerLane--;
             }
         }
         
-        // Move right function - now moves 50% of lane width
+        // Move right function - FIXED VERSION
         function moveRight() {
             if (!gameRunning) return;
             
-            // Calculate target position based on 50% shift
-            const currentTargetX = lanes[playerLane - 1];
-            const laneIndex = playerLane - 1;
-            
-            // If not already at rightmost position
-            if (laneIndex < 3) { // 4 lanes so max index is 3
-                // Move 50% towards right lane
-                const rightLaneX = lanes[laneIndex + 1];
-                const shiftAmount = (rightLaneX - currentTargetX) * 0.5; // 50% shift
-                
-                // Update player's target position
-                lanes[playerLane - 1] = currentTargetX + shiftAmount;
+            if (playerLane < 4) { // 4 lanes, so max is 4
+                playerLane++;
             }
         }
         
@@ -1170,10 +1154,10 @@
             
             const tilt = e.gamma;
             
-            if (tilt < -20) {
-                moveLeft();
-            } else if (tilt > 20) {
-                moveRight();
+            if (tilt < -20 && playerLane > 1) {
+                playerLane--;
+            } else if (tilt > 20 && playerLane < 4) {
+                playerLane++;
             }
         }
         
@@ -1225,7 +1209,7 @@
             stopAccelerating();
         });
         
-        // Left/Right buttons - now with 50% shift
+        // Left/Right buttons - FIXED VERSION
         leftBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveLeft();
