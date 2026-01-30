@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
     <style>
-        /* পূর্বের সব CSS একই থাকবে, শুধু controls সেকশনে সামান্য পরিবর্তন */
         * {
             margin: 0;
             padding: 0;
@@ -157,7 +156,7 @@
             margin-bottom: 25px;
         }
         
-        /* Control Buttons - FIXED */
+        /* Control Buttons */
         .controls {
             position: absolute;
             bottom: 180px;
@@ -200,6 +199,39 @@
         .accelerate-btn {
             color: #55ff55;
             border-color: #55ff55;
+        }
+        
+        /* Tilt Controls Buttons */
+        .tilt-controls {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            pointer-events: auto;
+            z-index: 3;
+        }
+        
+        .tilt-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid #4d94ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4d94ff;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+            transition: all 0.2s;
+        }
+        
+        .tilt-btn:active {
+            transform: scale(0.9);
+            background: rgba(77, 148, 255, 0.2);
         }
         
         .tilt-indicator {
@@ -249,6 +281,32 @@
             border: 1px solid #444;
         }
         
+        /* Tilt Warning */
+        .tilt-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            z-index: 20;
+            border: 2px solid #4d94ff;
+            max-width: 300px;
+        }
+        
+        .tilt-warning h3 {
+            color: #4d94ff;
+            margin-bottom: 10px;
+        }
+        
+        .tilt-warning p {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
         @media (max-width: 768px) {
             .game-title {
                 font-size: 1.8rem;
@@ -273,7 +331,7 @@
                 padding: 5px 10px;
             }
             
-            .control-btn {
+            .control-btn, .tilt-btn {
                 width: 65px;
                 height: 65px;
                 font-size: 1.8rem;
@@ -281,6 +339,10 @@
             
             .controls {
                 bottom: 160px;
+            }
+            
+            .tilt-controls {
+                bottom: 90px;
             }
             
             .instructions {
@@ -326,7 +388,7 @@
                 padding: 4px 8px;
             }
             
-            .control-btn {
+            .control-btn, .tilt-btn {
                 width: 60px;
                 height: 60px;
                 font-size: 1.6rem;
@@ -335,6 +397,10 @@
             .controls {
                 bottom: 150px;
                 padding: 0 25px;
+            }
+            
+            .tilt-controls {
+                bottom: 80px;
             }
             
             .instructions {
@@ -372,10 +438,25 @@
             <button class="menu-btn" id="soundToggle">
                 <i class="fas fa-volume-up"></i> SOUND ON
             </button>
+            <button class="menu-btn" id="enableTiltBtn">
+                <i class="fas fa-mobile-alt"></i> ENABLE TILT
+            </button>
             <div class="instructions">
-                <p>Use brake (left) and accelerate (right) buttons or tilt your device to steer</p>
+                <p>Use brake (left) and accelerate (right) buttons OR tilt buttons OR tilt your device</p>
                 <p>Avoid collisions with other vehicles!</p>
             </div>
+        </div>
+        
+        <!-- Tilt Warning -->
+        <div class="tilt-warning" id="tiltWarning">
+            <h3><i class="fas fa-exclamation-triangle"></i> Tilt Permission</h3>
+            <p>Some devices require permission for tilt controls. Please:</p>
+            <p>1. Make sure your device supports tilt</p>
+            <p>2. Allow motion sensor access</p>
+            <p>3. Or use the tilt buttons below</p>
+            <button class="menu-btn" id="continueBtn" style="font-size: 0.9rem; padding: 8px 15px;">
+                CONTINUE WITHOUT TILT
+            </button>
         </div>
         
         <!-- Game Canvas -->
@@ -386,7 +467,7 @@
             <div class="score-display">SCORE: <span id="score">0</span></div>
             <div class="tilt-indicator">
                 <i class="fas fa-mobile-alt tilt-icon"></i>
-                <span>TILT TO STEER</span>
+                <span id="tiltStatus">TILT: OFF</span>
             </div>
             
             <!-- Speed Indicator -->
@@ -413,6 +494,16 @@
                 </div>
                 <div class="control-btn accelerate-btn" id="accelerateBtn">
                     <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+            
+            <!-- Tilt Control Buttons -->
+            <div class="tilt-controls">
+                <div class="tilt-btn" id="leftBtn">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="tilt-btn" id="rightBtn">
+                    <i class="fas fa-arrow-right"></i>
                 </div>
             </div>
         </div>
@@ -447,6 +538,12 @@
         const accelerateBtn = document.getElementById('accelerateBtn');
         const soundToggle = document.getElementById('soundToggle');
         const speedValueDisplay = document.getElementById('speedValue');
+        const tiltStatus = document.getElementById('tiltStatus');
+        const enableTiltBtn = document.getElementById('enableTiltBtn');
+        const tiltWarning = document.getElementById('tiltWarning');
+        const continueBtn = document.getElementById('continueBtn');
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
         
         // Audio elements
         const engineSound = document.getElementById('engineSound');
@@ -471,8 +568,8 @@
         // Control states
         let isBraking = false;
         let isAccelerating = false;
-        let brakeInterval = null;
-        let accelerateInterval = null;
+        let isLeftPressed = false;
+        let isRightPressed = false;
         
         // Car sizes
         const PLAYER_CAR_WIDTH = 40;
@@ -781,6 +878,20 @@
             // Update speed display
             speedValueDisplay.textContent = Math.round(gameSpeed * 10);
             
+            // Handle left/right movement
+            if (isLeftPressed && playerLane > 1) {
+                playerLane--;
+                isLeftPressed = false; // Reset after one lane change
+            }
+            if (isRightPressed && playerLane < 3) {
+                playerLane++;
+                isRightPressed = false; // Reset after one lane change
+            }
+            
+            // Update player position based on lane
+            const targetX = lanes[playerLane - 1];
+            playerX += (targetX - playerX) * 0.1;
+            
             // Move road lines
             roadLines.forEach(line => {
                 line.y += gameSpeed;
@@ -865,10 +976,6 @@
                 }
             });
             
-            // Update player position based on lane
-            const targetX = lanes[playerLane - 1];
-            playerX += (targetX - playerX) * 0.1;
-            
             // Gradually increase base speed with score
             baseSpeed = 5 + score * 0.05;
         }
@@ -890,6 +997,8 @@
             // Reset control states
             isBraking = false;
             isAccelerating = false;
+            isLeftPressed = false;
+            isRightPressed = false;
             
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
@@ -938,6 +1047,8 @@
             gameRunning = false;
             isBraking = false;
             isAccelerating = false;
+            isLeftPressed = false;
+            isRightPressed = false;
             gameOverScreen.style.display = 'none';
             gameMenu.style.display = 'flex';
             
@@ -978,6 +1089,63 @@
             isAccelerating = false;
         }
         
+        // Enable tilt controls
+        function enableTiltControls() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ devices
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            tiltControl = true;
+                            tiltStatus.textContent = "TILT: ON";
+                            window.addEventListener('deviceorientation', handleDeviceOrientation);
+                            alert("Tilt controls enabled! Tilt your device left/right to steer.");
+                        } else {
+                            tiltControl = false;
+                            tiltStatus.textContent = "TILT: PERMISSION DENIED";
+                            showTiltWarning();
+                        }
+                    })
+                    .catch(console.error);
+            } else if ('DeviceOrientationEvent' in window) {
+                // Android and other devices
+                tiltControl = true;
+                tiltStatus.textContent = "TILT: ON";
+                window.addEventListener('deviceorientation', handleDeviceOrientation);
+                alert("Tilt controls enabled! Tilt your device left/right to steer.");
+            } else {
+                // Device doesn't support tilt
+                tiltControl = false;
+                tiltStatus.textContent = "TILT: NOT SUPPORTED";
+                showTiltWarning();
+            }
+        }
+        
+        // Show tilt warning
+        function showTiltWarning() {
+            tiltWarning.style.display = 'block';
+        }
+        
+        // Hide tilt warning
+        function hideTiltWarning() {
+            tiltWarning.style.display = 'none';
+        }
+        
+        // Tilt controls handler
+        function handleDeviceOrientation(e) {
+            if (!tiltControl || !gameRunning) return;
+            
+            const tilt = e.gamma; // Left/Right tilt (-90 to 90)
+            
+            if (tilt < -20 && playerLane > 1) {
+                playerLane = 1;
+            } else if (tilt > 20 && playerLane < 3) {
+                playerLane = 3;
+            } else if (tilt >= -10 && tilt <= 10) {
+                playerLane = 2;
+            }
+        }
+        
         // Main game loop
         function gameLoop() {
             // Clear canvas
@@ -997,25 +1165,12 @@
             }
         }
         
-        // Tilt controls
-        function handleDeviceOrientation(e) {
-            if (!tiltControl || !gameRunning) return;
-            
-            const tilt = e.gamma;
-            
-            if (tilt < -15 && playerLane > 1) {
-                playerLane = 1;
-            } else if (tilt > 15 && playerLane < 3) {
-                playerLane = 3;
-            } else if (tilt >= -15 && tilt <= 15) {
-                playerLane = 2;
-            }
-        }
-        
-        // Event listeners - FIXED
+        // Event listeners
         startBtn.addEventListener('click', startGame);
         playAgainBtn.addEventListener('click', restartGame);
         menuBtn.addEventListener('click', goToMainMenu);
+        enableTiltBtn.addEventListener('click', enableTiltControls);
+        continueBtn.addEventListener('click', hideTiltWarning);
         
         // Brake button events
         brakeBtn.addEventListener('touchstart', (e) => {
@@ -1024,21 +1179,6 @@
         });
         
         brakeBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            stopBraking();
-        });
-        
-        brakeBtn.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            startBraking();
-        });
-        
-        brakeBtn.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            stopBraking();
-        });
-        
-        brakeBtn.addEventListener('mouseleave', (e) => {
             e.preventDefault();
             stopBraking();
         });
@@ -1054,6 +1194,32 @@
             stopAccelerating();
         });
         
+        // Left/Right buttons for tilt alternative
+        leftBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && playerLane > 1) {
+                playerLane--;
+            }
+        });
+        
+        rightBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameRunning && playerLane < 3) {
+                playerLane++;
+            }
+        });
+        
+        // Mouse events for desktop testing
+        brakeBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startBraking();
+        });
+        
+        brakeBtn.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            stopBraking();
+        });
+        
         accelerateBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
             startAccelerating();
@@ -1064,13 +1230,19 @@
             stopAccelerating();
         });
         
-        accelerateBtn.addEventListener('mouseleave', (e) => {
+        leftBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            stopAccelerating();
+            if (gameRunning && playerLane > 1) {
+                playerLane--;
+            }
         });
         
-        // Mobile tilt controls
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
+        rightBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (gameRunning && playerLane < 3) {
+                playerLane++;
+            }
+        });
         
         // Toggle sound
         soundToggle.addEventListener('click', () => {
@@ -1088,7 +1260,7 @@
             }
         });
         
-        // Keyboard controls
+        // Keyboard controls for desktop
         document.addEventListener('keydown', (e) => {
             if (!gameRunning) return;
             
@@ -1104,6 +1276,14 @@
                     break;
                 case 'ArrowDown':
                     startBraking();
+                    break;
+                case 'a':
+                case 'A':
+                    if (playerLane > 1) playerLane--;
+                    break;
+                case 'd':
+                case 'D':
+                    if (playerLane < 3) playerLane++;
                     break;
             }
         });
@@ -1132,8 +1312,12 @@
         window.addEventListener('load', () => {
             resizeCanvas();
             drawEnvironment();
-            if ('ontouchstart' in window) {
-                tiltControl = true;
+            
+            // Check if device supports tilt
+            if ('DeviceOrientationEvent' in window) {
+                tiltStatus.textContent = "TILT: AVAILABLE";
+            } else {
+                tiltStatus.textContent = "TILT: NOT SUPPORTED";
             }
         });
     </script>
