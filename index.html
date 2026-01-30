@@ -673,10 +673,10 @@
                 height: 600
             });
             
-            // Initialize other cars - now for 4 lanes, but NOT in lane 4
+            // Initialize other cars - now for ALL 4 lanes (1, 2, 3, and 4)
             for (let i = 0; i < 6; i++) {
-                // Generate lane 1, 2, or 3 only (NOT 4)
-                const lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
+                // Generate lane 1, 2, 3, or 4 - ALL lanes
+                const lane = Math.floor(Math.random() * 4) + 1; // 1, 2, 3, or 4
                 const colors = ['#FF3333', '#3333FF', '#FFAA33', '#33FF33', '#FF33FF'];
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 
@@ -692,10 +692,10 @@
                 });
             }
             
-            // Initialize trucks - now for 4 lanes, but NOT in lane 4
+            // Initialize trucks - now for ALL 4 lanes (1, 2, 3, and 4)
             for (let i = 0; i < 3; i++) {
-                // Generate lane 1, 2, or 3 only (NOT 4)
-                const lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
+                // Generate lane 1, 2, 3, or 4 - ALL lanes
+                const lane = Math.floor(Math.random() * 4) + 1; // 1, 2, 3, or 4
                 
                 trucks.push({
                     x: lanes[lane - 1],
@@ -934,8 +934,8 @@
                 // Reset car position when off screen
                 if (car.y > canvas.height + 200) {
                     car.y = -200;
-                    // Generate lane 1, 2, or 3 only (NOT 4)
-                    car.lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
+                    // Generate lane 1, 2, 3, or 4 - ALL lanes
+                    car.lane = Math.floor(Math.random() * 4) + 1; // 1, 2, 3, or 4
                     car.x = lanes[car.lane - 1];
                     car.speed = 4 + Math.random() * 3;
                     car.passed = false;
@@ -965,8 +965,8 @@
                 // Reset truck position when off screen
                 if (truck.y > canvas.height + 200) {
                     truck.y = -600;
-                    // Generate lane 1, 2, or 3 only (NOT 4)
-                    truck.lane = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3 only
+                    // Generate lane 1, 2, 3, or 4 - ALL lanes
+                    truck.lane = Math.floor(Math.random() * 4) + 1; // 1, 2, 3, or 4
                     truck.x = lanes[truck.lane - 1];
                     truck.speed = 3 + Math.random() * 2;
                     truck.passed = false;
@@ -1097,11 +1097,11 @@
             }
         }
         
-        // Move right function - FIXED VERSION
+        // Move right function
         function moveRight() {
             if (!gameRunning) return;
             
-            if (playerLane < 4) { // 4 lanes, so max is 4
+            if (playerLane < 4) {
                 playerLane++;
             }
         }
@@ -1209,7 +1209,7 @@
             stopAccelerating();
         });
         
-        // Left/Right buttons - FIXED VERSION
+        // Left/Right buttons
         leftBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveLeft();
