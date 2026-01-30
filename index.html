@@ -447,7 +447,7 @@
             <div class="instructions">
                 <p>Left side: Brake (top), Left turn (bottom)</p>
                 <p>Right side: Accelerate (top), Right turn (bottom)</p>
-                <p>Avoid collisions with other vehicles!</p>
+                <p>4 Lanes - 50% shift per click | Avoid collisions!</p>
             </div>
         </div>
         
@@ -563,8 +563,9 @@
         let playerSpeed = 5;
         let playerX = 0;
         let playerY = 0;
-        let playerLane = 2;
+        let playerLane = 2; // Now 4 lanes, starting in lane 2
         let lanes = [];
+        let laneWidth = 0;
         let tiltControl = false;
         let soundOn = true;
         let animationFrameId = null;
@@ -572,10 +573,8 @@
         // Control states
         let isBraking = false;
         let isAccelerating = false;
-        let isLeftPressed = false;
-        let isRightPressed = false;
         
-        // Car sizes - ছোট করা হয়েছে
+        // Car sizes
         const PLAYER_CAR_WIDTH = 35;
         const PLAYER_CAR_HEIGHT = 70;
         const OTHER_CAR_WIDTH = 30;
@@ -595,15 +594,21 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
+            // 4 lanes for the road
+            const roadWidth = canvas.width * 0.6;
+            const roadStartX = canvas.width * 0.2;
+            laneWidth = roadWidth / 4;
+            
             lanes = [
-                canvas.width * 0.2,
-                canvas.width * 0.5 - PLAYER_CAR_WIDTH/2,
-                canvas.width * 0.8 - PLAYER_CAR_WIDTH
+                roadStartX + laneWidth * 0.5 - PLAYER_CAR_WIDTH/2,
+                roadStartX + laneWidth * 1.5 - PLAYER_CAR_WIDTH/2,
+                roadStartX + laneWidth * 2.5 - PLAYER_CAR_WIDTH/2,
+                roadStartX + laneWidth * 3.5 - PLAYER_CAR_WIDTH/2
             ];
             
             playerLane = 2;
             playerX = lanes[playerLane - 1];
-            playerY = canvas.height - PLAYER_CAR_HEIGHT - 70; // এখানে 70 করেছি
+            playerY = canvas.height - PLAYER_CAR_HEIGHT - 70;
         }
         
         // Initialize game objects
@@ -614,7 +619,7 @@
             playerSpeed = 5;
             playerLane = 2;
             playerX = lanes[playerLane - 1];
-            playerY = canvas.height - PLAYER_CAR_HEIGHT - 70; // এখানেও 70 করেছি
+            playerY = canvas.height - PLAYER_CAR_HEIGHT - 70;
             
             scoreDisplay.textContent = score;
             speedValueDisplay.textContent = Math.round(gameSpeed * 10);
@@ -668,9 +673,9 @@
                 height: 600
             });
             
-            // Initialize other cars
-            for (let i = 0; i < 5; i++) {
-                const lane = Math.floor(Math.random() * 3) + 1;
+            // Initialize other cars - now for 4 lanes
+            for (let i = 0; i < 6; i++) {
+                const lane = Math.floor(Math.random() * 4) + 1;
                 const colors = ['#FF3333', '#3333FF', '#FFAA33', '#33FF33', '#FF33FF'];
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 
@@ -686,9 +691,9 @@
                 });
             }
             
-            // Initialize trucks
-            for (let i = 0; i < 2; i++) {
-                const lane = Math.floor(Math.random() * 3) + 1;
+            // Initialize trucks - now for 4 lanes
+            for (let i = 0; i < 3; i++) {
+                const lane = Math.floor(Math.random() * 4) + 1;
                 
                 trucks.push({
                     x: lanes[lane - 1],
@@ -703,7 +708,7 @@
             }
         }
         
-        // Draw player car - ছোট আকারে
+        // Draw player car
         function drawPlayerCar() {
             // Car body
             ctx.fillStyle = '#000';
@@ -761,7 +766,7 @@
             ctx.fill();
         }
         
-        // Draw other cars - ছোট আকারে
+        // Draw other cars
         function drawOtherCars() {
             // Regular cars
             otherCars.forEach(car => {
@@ -835,7 +840,7 @@
                 }
             });
             
-            // Road
+            // Road - Wider for 4 lanes
             ctx.fillStyle = '#555';
             ctx.fillRect(canvas.width * 0.2, 0, canvas.width * 0.6, canvas.height);
             
@@ -882,19 +887,9 @@
             // Update speed display
             speedValueDisplay.textContent = Math.round(gameSpeed * 10);
             
-            // Handle left/right movement
-            if (isLeftPressed && playerLane > 1) {
-                playerLane--;
-                isLeftPressed = false;
-            }
-            if (isRightPressed && playerLane < 3) {
-                playerLane++;
-                isRightPressed = false;
-            }
-            
-            // Update player position based on lane
+            // Update player position based on lane with 50% shift
             const targetX = lanes[playerLane - 1];
-            playerX += (targetX - playerX) * 0.1;
+            playerX += (targetX - playerX) * 0.5; // 50% shift (আধা শিফট)
             
             // Move road lines
             roadLines.forEach(line => {
@@ -937,7 +932,7 @@
                 // Reset car position when off screen
                 if (car.y > canvas.height + 200) {
                     car.y = -200;
-                    car.lane = Math.floor(Math.random() * 3) + 1;
+                    car.lane = Math.floor(Math.random() * 4) + 1; // 4 lanes
                     car.x = lanes[car.lane - 1];
                     car.speed = 4 + Math.random() * 3;
                     car.passed = false;
@@ -967,7 +962,7 @@
                 // Reset truck position when off screen
                 if (truck.y > canvas.height + 200) {
                     truck.y = -600;
-                    truck.lane = Math.floor(Math.random() * 3) + 1;
+                    truck.lane = Math.floor(Math.random() * 4) + 1; // 4 lanes
                     truck.x = lanes[truck.lane - 1];
                     truck.speed = 3 + Math.random() * 2;
                     truck.passed = false;
@@ -1001,8 +996,6 @@
             // Reset control states
             isBraking = false;
             isAccelerating = false;
-            isLeftPressed = false;
-            isRightPressed = false;
             
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
@@ -1051,8 +1044,6 @@
             gameRunning = false;
             isBraking = false;
             isAccelerating = false;
-            isLeftPressed = false;
-            isRightPressed = false;
             gameOverScreen.style.display = 'none';
             gameMenu.style.display = 'flex';
             
@@ -1091,6 +1082,44 @@
         
         function stopAccelerating() {
             isAccelerating = false;
+        }
+        
+        // Move left function - now moves 50% of lane width
+        function moveLeft() {
+            if (!gameRunning) return;
+            
+            // Calculate target position based on 50% shift
+            const currentTargetX = lanes[playerLane - 1];
+            const laneIndex = playerLane - 1;
+            
+            // If not already at leftmost position
+            if (laneIndex > 0) {
+                // Move 50% towards left lane
+                const leftLaneX = lanes[laneIndex - 1];
+                const shiftAmount = (leftLaneX - currentTargetX) * 0.5; // 50% shift
+                
+                // Update player's target position
+                lanes[playerLane - 1] = currentTargetX + shiftAmount;
+            }
+        }
+        
+        // Move right function - now moves 50% of lane width
+        function moveRight() {
+            if (!gameRunning) return;
+            
+            // Calculate target position based on 50% shift
+            const currentTargetX = lanes[playerLane - 1];
+            const laneIndex = playerLane - 1;
+            
+            // If not already at rightmost position
+            if (laneIndex < 3) { // 4 lanes so max index is 3
+                // Move 50% towards right lane
+                const rightLaneX = lanes[laneIndex + 1];
+                const shiftAmount = (rightLaneX - currentTargetX) * 0.5; // 50% shift
+                
+                // Update player's target position
+                lanes[playerLane - 1] = currentTargetX + shiftAmount;
+            }
         }
         
         // Enable tilt controls
@@ -1141,12 +1170,10 @@
             
             const tilt = e.gamma;
             
-            if (tilt < -20 && playerLane > 1) {
-                playerLane = 1;
-            } else if (tilt > 20 && playerLane < 3) {
-                playerLane = 3;
-            } else if (tilt >= -10 && tilt <= 10) {
-                playerLane = 2;
+            if (tilt < -20) {
+                moveLeft();
+            } else if (tilt > 20) {
+                moveRight();
             }
         }
         
@@ -1198,19 +1225,15 @@
             stopAccelerating();
         });
         
-        // Left/Right buttons
+        // Left/Right buttons - now with 50% shift
         leftBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning && playerLane > 1) {
-                isLeftPressed = true;
-            }
+            moveLeft();
         });
         
         rightBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameRunning && playerLane < 3) {
-                isRightPressed = true;
-            }
+            moveRight();
         });
         
         // Mouse events for desktop testing
@@ -1236,16 +1259,12 @@
         
         leftBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            if (gameRunning && playerLane > 1) {
-                isLeftPressed = true;
-            }
+            moveLeft();
         });
         
         rightBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            if (gameRunning && playerLane < 3) {
-                isRightPressed = true;
-            }
+            moveRight();
         });
         
         // Toggle sound
@@ -1270,10 +1289,10 @@
             
             switch(e.key) {
                 case 'ArrowLeft':
-                    if (playerLane > 1) playerLane--;
+                    moveLeft();
                     break;
                 case 'ArrowRight':
-                    if (playerLane < 3) playerLane++;
+                    moveRight();
                     break;
                 case 'ArrowUp':
                     startAccelerating();
@@ -1283,11 +1302,11 @@
                     break;
                 case 'a':
                 case 'A':
-                    if (playerLane > 1) playerLane--;
+                    moveLeft();
                     break;
                 case 'd':
                 case 'D':
-                    if (playerLane < 3) playerLane++;
+                    moveRight();
                     break;
             }
         });
