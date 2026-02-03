@@ -275,14 +275,11 @@ GitHub: https://github.com/fojlerabby
 - 💼 **Role**: Full Stack Developer & Game Designer
 - 🎮 **Specialty**: HTML5 Game Development
 - 🌐 **Portfolio**: [Coming Soon]
-- 📧 **Email**: fojlerabby@example.com
-- 💼 **LinkedIn**: [Md Fojle Rabby](https://linkedin.com/in/fojlerabby)
-- 🐙 **GitHub**: [@fojlerabby](https://github.com/fojlerabby)
+- 📧 **Email**: mdfojlerabby4@gmail.com
+- 🐙 **GitHub**: [@fojlerabby](https://github.com/mdfojlerabby4)
 
 ### **Contact**
-- 📧 **Email**: fojlerabby@example.com
-- 🐦 **Twitter**: [@fojlerabby](https://twitter.com/fojlerabby)
-- 💼 **LinkedIn**: [Md Fojle Rabby](https://linkedin.com/in/fojlerabby)
+- 📧 **Email**: mdfojlerabby4@gmail.com
 
 ### **Support the Developer**
 If you like this game, you can:
@@ -290,8 +287,7 @@ If you like this game, you can:
 - 🐛 Report issues and bugs
 - 💡 Suggest new features
 - 🔗 Share with friends
-- ☕ [Buy Me a Coffee](https://buymeacoffee.com/fojlerabby) *[Link to be added]*
-
+- 
 ## 🔗 Useful Links
 
 - **[Live Demo](https://rabby-racing-car.netlify.app)** - Play the game online
@@ -364,3 +360,4 @@ If you like this game, you can:
 ---
 *Last Updated: November 2024*  
 *Game Version: 1.0.0*
+
