@@ -11,7 +11,7 @@
   **A thrilling racing game built with HTML5 Canvas**  
   *Touch. Drag. Race. Win!*
   
-  [![Play Now](https://img.shields.io/badge/PLAY_NOW-FF4400?style=for-the-badge&logo=gamepad&logoColor=white)](https://rabby-racing-car.netlify.app)
+  [![Play Now](https://img.shields.io/badge/PLAY_NOW-FF4400?style=for-the-badge&logo=gamepad&logoColor=white)](https://mdfojlerabby4.github.io/car-racing-game)
   [![Demo](https://img.shields.io/badge/DEMO_Video-FF9900?style=for-the-badge&logo=youtube&logoColor=white)](#demo)
 
 </div>
@@ -360,4 +360,5 @@ If you like this game, you can:
 ---
 *Last Updated: November 2024*  
 *Game Version: 1.0.0*
+
 
